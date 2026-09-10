@@ -148,9 +148,9 @@ export const MainMenu: React.FC<MainMenuProps> = ({
               </div>
               <div className="p-2 rounded-xl bg-slate-800/80 border border-slate-700">
                 <strong className="text-amber-300 flex items-center gap-1 mb-0.5">
-                  <Footprints className="w-3.5 h-3.5" /> 4. Langkah Kaki & Suara
+                  <Footprints className="w-3.5 h-3.5" /> 4. Kontrol Jalan & Suara
                 </strong>
-                Jongkok <strong>[C]</strong> agar senyap tanpa suara. Berlari <strong>[Shift]</strong> cepat tapi suaramu terdengar oleh hantu!
+                <strong>W</strong> (Maju), <strong>A</strong> (Kiri), <strong>S</strong> (Mundur), <strong>D</strong> (Kanan). Jongkok <strong>[C]</strong> senyap, Lari <strong>[Shift]</strong> bising!
               </div>
             </div>
             <div className="mt-2.5 text-center">

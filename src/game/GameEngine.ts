@@ -717,17 +717,27 @@ export class GameEngine {
       this.playerThiefHand.position.x = 0.35 + Math.sin(timeSec * 8) * 0.03;
       this.playerThiefHand.position.y = -0.32 + Math.cos(timeSec * 8) * 0.03;
 
-      // Move along player's facing direction
+      // Movement vector relative to camera facing direction:
+      // Camera faces along -Z when rotationY = 0.
+      // Forward Vector F: (-sin(angle), -cos(angle)) -> W: Maju
+      // Backward Vector B: (sin(angle), cos(angle))  -> S: Mundur
+      // Right Vector R:   (cos(angle), -sin(angle))  -> D: Kanan
+      // Left Vector L:    (-cos(angle), sin(angle))  -> A: Kiri
       const angle = this.player.rotationY;
-      const nx = forwardInput * Math.sin(angle) + strafeInput * Math.cos(angle);
-      const nz = forwardInput * Math.cos(angle) - strafeInput * Math.sin(angle);
+      const sinA = Math.sin(angle);
+      const cosA = Math.cos(angle);
 
-      const norm = Math.hypot(nx, nz);
-      const moveX = (nx / norm) * speed * delta;
-      const moveZ = (nz / norm) * speed * delta;
+      // forwardInput: +1 for W (Maju), -1 for S (Mundur)
+      // strafeInput:  +1 for D (Kanan), -1 for A (Kiri)
+      const dirX = forwardInput * (-sinA) + strafeInput * cosA;
+      const dirZ = forwardInput * (-cosA) + strafeInput * (-sinA);
 
-      const targetX = this.player.x - moveX;
-      const targetZ = this.player.z - moveZ;
+      const norm = Math.hypot(dirX, dirZ);
+      const moveX = (dirX / norm) * speed * delta;
+      const moveZ = (dirZ / norm) * speed * delta;
+
+      const targetX = this.player.x + moveX;
+      const targetZ = this.player.z + moveZ;
 
       // Collision checks with walls & furniture
       if (!this.checkPlayerCollision(targetX, targetZ)) {
@@ -1029,69 +1039,84 @@ export class GameEngine {
 
   private setupControls() {
     window.addEventListener('keydown', (e) => {
-      switch (e.code) {
-        case 'KeyW':
-        case 'ArrowUp':
-          this.moveForward = true;
-          break;
-        case 'KeyS':
-        case 'ArrowDown':
-          this.moveBackward = true;
-          break;
-        case 'KeyA':
-        case 'ArrowLeft':
-          this.moveLeft = true;
-          break;
-        case 'KeyD':
-        case 'ArrowRight':
-          this.moveRight = true;
-          break;
-        case 'KeyC':
-          this.toggleCrouch();
-          break;
-        case 'ShiftLeft':
-        case 'ShiftRight':
-          this.setSprinting(true);
-          break;
-        case 'KeyE':
-        case 'Space':
-          this.interact();
-          break;
-        case 'KeyF':
-          this.throwDistractionToy();
-          break;
-        case 'KeyG':
-          this.useSmokeBomb();
-          break;
-        case 'KeyT':
-          this.toggleFlashlight();
-          break;
+      const code = e.code;
+      const key = e.key ? e.key.toLowerCase() : '';
+
+      // W: Bergerak maju
+      if (code === 'KeyW' || key === 'w' || code === 'ArrowUp' || key === 'arrowup') {
+        this.moveForward = true;
+      }
+      // S: Bergerak mundur
+      else if (code === 'KeyS' || key === 's' || code === 'ArrowDown' || key === 'arrowdown') {
+        this.moveBackward = true;
+      }
+      // A: Bergerak ke kiri
+      else if (code === 'KeyA' || key === 'a' || code === 'ArrowLeft' || key === 'arrowleft') {
+        this.moveLeft = true;
+      }
+      // D: Bergerak ke kanan
+      else if (code === 'KeyD' || key === 'd' || code === 'ArrowRight' || key === 'arrowright') {
+        this.moveRight = true;
+      }
+      // C: Jongkok / Menyusup senyap
+      else if (code === 'KeyC' || key === 'c') {
+        this.toggleCrouch();
+      }
+      // Shift: Lari cepat
+      else if (code === 'ShiftLeft' || code === 'ShiftRight' || key === 'shift') {
+        this.setSprinting(true);
+      }
+      // E / Space: Interaksi (Ambil barang / Sembunyi lemari / Buka pintu)
+      else if (code === 'KeyE' || key === 'e' || code === 'Space' || key === ' ') {
+        this.interact();
+      }
+      // F: Lempar mainan pengecoh
+      else if (code === 'KeyF' || key === 'f') {
+        this.throwDistractionToy();
+      }
+      // G: Bom asap gaib
+      else if (code === 'KeyG' || key === 'g') {
+        this.useSmokeBomb();
+      }
+      // T: Senter
+      else if (code === 'KeyT' || key === 't') {
+        this.toggleFlashlight();
       }
     });
 
     window.addEventListener('keyup', (e) => {
-      switch (e.code) {
-        case 'KeyW':
-        case 'ArrowUp':
-          this.moveForward = false;
-          break;
-        case 'KeyS':
-        case 'ArrowDown':
-          this.moveBackward = false;
-          break;
-        case 'KeyA':
-        case 'ArrowLeft':
-          this.moveLeft = false;
-          break;
-        case 'KeyD':
-        case 'ArrowRight':
-          this.moveRight = false;
-          break;
-        case 'ShiftLeft':
-        case 'ShiftRight':
-          this.setSprinting(false);
-          break;
+      const code = e.code;
+      const key = e.key ? e.key.toLowerCase() : '';
+
+      // Stop Maju (W)
+      if (code === 'KeyW' || key === 'w' || code === 'ArrowUp' || key === 'arrowup') {
+        this.moveForward = false;
       }
+      // Stop Mundur (S)
+      else if (code === 'KeyS' || key === 's' || code === 'ArrowDown' || key === 'arrowdown') {
+        this.moveBackward = false;
+      }
+      // Stop Kiri (A)
+      else if (code === 'KeyA' || key === 'a' || code === 'ArrowLeft' || key === 'arrowleft') {
+        this.moveLeft = false;
+      }
+      // Stop Kanan (D)
+      else if (code === 'KeyD' || key === 'd' || code === 'ArrowRight' || key === 'arrowright') {
+        this.moveRight = false;
+      }
+      // Stop Lari
+      else if (code === 'ShiftLeft' || code === 'ShiftRight' || key === 'shift') {
+        this.setSprinting(false);
+      }
+    });
+
+    // Prevent sticky keys if user tabs away or clicks out
+    window.addEventListener('blur', () => {
+      this.moveForward = false;
+      this.moveBackward = false;
+      this.moveLeft = false;
+      this.moveRight = false;
+      this.setSprinting(false);
     });
 
     // Pointer Lock & Mouse Look
