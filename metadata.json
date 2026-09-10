@@ -1,0 +1,6 @@
+{
+  "name": "Spooky Heist: Ghost Patrol 3D",
+  "description": "Game stealth first-person bernuansa kartun ala Robbery Bob di mana pemain harus menyusup, mencari barang rampasan rahasia, dan sembunyi dari kejaran polisi hantu!",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
